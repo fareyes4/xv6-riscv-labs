@@ -110,6 +110,7 @@ allocproc(void)
   for(p = proc; p < &proc[NPROC]; p++) {
     acquire(&p->lock);
     if(p->state == UNUSED) {
+      p->cputime = 0;
       goto found;
     } else {
       release(&p->lock);
