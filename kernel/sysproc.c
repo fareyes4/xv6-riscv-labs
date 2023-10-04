@@ -39,6 +39,17 @@ sys_wait(void)
 }
 
 uint64
+sys_wait2(int* status, struct rusage* usage)
+{
+  // Check if the arguments are valid
+  if (argptr(0, (char**)status, sizeof(int)) < 0 ||
+      argptr(1, (char**)usage, sizeof(struct rusage)) < 0)
+    return -1;
+
+  return wait2(status, usage); // Call the new wait2 function
+}
+
+uint64
 sys_sbrk(void)
 {
   int addr;
