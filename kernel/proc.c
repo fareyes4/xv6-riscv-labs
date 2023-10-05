@@ -6,6 +6,7 @@
 #include "proc.h"
 #include "pstat.h"
 #include "defs.h"
+#include "syscall.h"
 
 struct cpu cpus[NCPU];
 
@@ -436,6 +437,54 @@ wait(uint64 addr)
 //  - swtch to start running that process.
 //  - eventually that process transfers control
 //    via swtch back to the scheduler.
+
+int 
+wait2(uint64 status, uint64 rusage)
+{
+   struct proc *np;
+   struct proc *p = myproc();
+   struct rusage ru;
+   int havekids, pid;
+   acquire(&p->lock);
+   for(;;){
+      havekids=0;
+      for (np=proc; np<&proc[NPROC]; np++){
+         if (np->parent==p){
+            acquire(&np->lock);
+            havekids=1;
+            if (np->state == ZOMBIE){
+               pid = np->pid;
+               ru.cputime = np->cputime;
+               if(status != 0 && copyout(p->pagetable, status, (char *)& np->xstate, sizeof(np->xstate))<0){
+                  release(&np->lock);
+                  release(&wait_lock);
+                  return -1;
+                }
+               if (rusage !=0 && copyout(p->pagetable, rusage, (char *) & ru.cputime, sizeof(ru.cputime))<0) {
+                  release(&np->lock);
+                  release(&wait_lock);
+                  return -1;
+                 }
+                 freeproc(np);
+                 release(&np->lock);
+                 release(&wait_lock);
+                 return pid;
+             }
+             release(&np->lock);    
+        }
+       }
+       
+        if(!havekids ||p->killed){
+           release(&wait_lock);
+           return -1;
+        }
+        
+        printf("Sleep if\n");
+        sleep(p, &wait_lock);
+           
+        }
+     }
+
 void
 scheduler(void)
 {

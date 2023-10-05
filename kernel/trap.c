@@ -167,7 +167,7 @@ clockintr()
   
   struct proc*p = myproc();
   if (p && p->state == RUNNING) {
-  P->cputime++;
+  p->cputime++;
   }
   
   wakeup(&ticks);

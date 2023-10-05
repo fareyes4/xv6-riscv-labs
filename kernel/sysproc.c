@@ -1,11 +1,12 @@
-#include "types.h"
-#include "riscv.h"
-#include "defs.h"
-#include "date.h"
-#include "param.h"
-#include "memlayout.h"
-#include "spinlock.h"
-#include "proc.h"
+#include "kernel/types.h"
+#include "kernel/riscv.h"
+#include "kernel/defs.h"
+#include "kernel/date.h"
+#include "kernel/param.h"
+#include "kernel/memlayout.h"
+#include "kernel/spinlock.h"
+#include "kernel/proc.h"
+#include "kernel/pstat.h"
 
 uint64
 sys_exit(void)
@@ -39,14 +40,14 @@ sys_wait(void)
 }
 
 uint64
-sys_wait2(int* status, struct rusage* usage)
+sys_wait2(void)
 {
-  // Check if the arguments are valid
-  if (argptr(0, (char**)status, sizeof(int)) < 0 ||
-      argptr(1, (char**)usage, sizeof(struct rusage)) < 0)
+  uint64 status;
+  uint64 rusage;
+  if (argaddr(0, &status)<0 || argaddr(1,&rusage)<0)
     return -1;
 
-  return wait2(status, usage); // Call the new wait2 function
+  return wait2(status, rusage);
 }
 
 uint64
