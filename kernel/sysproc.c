@@ -46,7 +46,6 @@ sys_wait2(void)
   uint64 rusage;
   if (argaddr(0, &status)<0 || argaddr(1,&rusage)<0)
     return -1;
-
   return wait2(status, rusage);
 }
 
