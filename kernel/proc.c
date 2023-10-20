@@ -321,7 +321,7 @@ fork(void)
   acquire(&np->lock);
   np->state = RUNNABLE;
   np->priority = p->priority;
-  p->readytime = sys_uptime();
+  np->readytime = sys_uptime();
   release(&np->lock);
 
   return pid;
@@ -501,7 +501,6 @@ scheduler(void)
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state == RUNNABLE) {
-         p->readytime = sys_uptime();
         p->state = RUNNING;
         p->readytime = sys_uptime();
         c->proc = p;
