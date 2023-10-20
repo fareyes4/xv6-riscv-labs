@@ -64,6 +64,25 @@ sys_sbrk(void)
 }
 
 uint64
+sys_getpriority(void)
+{
+   return myproc()->priority;
+}
+
+uint64
+sys_setpriority(void)
+{
+   int p;
+   if(argint(0,&p)<0)
+      return -1;
+   if(p<0 || p>99)
+      return -1;
+      
+   myproc()->priority=p;
+   return 0;
+}
+
+uint64
 sys_sleep(void)
 {
   int n;

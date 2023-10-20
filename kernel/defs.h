@@ -9,7 +9,9 @@ struct sleeplock;
 struct stat;
 struct superblock;
 
-// bio.c
+uint64          sys_uptime(void);
+
+// bio.cs
 void            binit(void);
 struct buf*     bread(uint, uint);
 void            brelse(struct buf*);

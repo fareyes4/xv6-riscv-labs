@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[]){
         if (argc < 2) {
-                printf("Usage: time1 <command>\n");
+                printf("Usage: time1\n");
                 exit(1);
         }
         int stime = uptime();
