@@ -2,8 +2,10 @@
 #include "user/user.h"
  
 int main(int argc, char *argv[]) {
+
     if (argc != 4) {
-        printf("Usage: memory-user <start> <limit> <increment>, where <start> is initial and goes up to limit \n");
+
+        printf("Usage: memory-user <start> <limit> <increment>, where <start> is initial mebibytes to allocate which is then incremented up to limit mebibytess\n");
 
         exit(-1);
 
@@ -23,15 +25,15 @@ int main(int argc, char *argv[]) {
 
     for (i=start; i<=limit; i+=increment) {
 
-	printf("allocating %p ", i); 
+	printf("allocating %p mebibytes\n", i); 
 
 	array = (int *) malloc(i*1024*1024);
 
-	printf("Returned %p\n", array);
+	printf("malloc returned %p\n", array);
 
         if (!array) {
 
-            printf("Failed\n");
+            printf("malloc failed\n");
 
 	    exit(-1);
 
@@ -39,7 +41,7 @@ int main(int argc, char *argv[]) {
 
 	sleep(50);
 
-	printf("freeing %p ", i); 
+	printf("freeing %p mebibytes\n", i); 
 
 	free(array);
 
