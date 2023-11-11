@@ -138,6 +138,7 @@ UPROGS=\
 	$U/_pstest\
 	$U/_free\
 	$U/_memory-user\
+	$U/_testcase\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
