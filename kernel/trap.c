@@ -100,10 +100,28 @@ usertrap(void)
       p->killed=1;
       exit(-1);
     }
-  } else {
+  // Add new mapping for the allocated physical page into the page tables for all processes in the family
+      for(int i = 0; i < MAX_MMR; i++) {
+        if(p->mmr[i].valid && stval >= p->mmr[i].addr && stval < p->mmr[i].addr + p->mmr[i].length) {
+	  struct mmr_list *mmr_list = get_mmr_list(p->mmr->mmr_family.listid);
+          while (mmr_list != &(p->mmr[i].mmr_family)) {
+            struct proc *family_proc = mmr_list->myproc();
+            if (family_proc != p) {
+              // Duplicate the new mapping for other processes in the family
+              if (mappages(family_proc->pagetable, PGROUNDDOWN(stval), PGSIZE, (uint64)mem, PTE_W | PTE_X | PTE_R | PTE_U) < 0) {
+                kfree(mem);
+                p->killed = 1;
+                exit(-1);
+              }
+            }
+            mmr_list = mmr_list->next;
+          }
+        }
+      }
+    else {
   
     printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
-    printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
+    printf(" sepc=%p stval=%p\n", r_sepc(), r_stval());
     p->killed = 1;
   }
 
