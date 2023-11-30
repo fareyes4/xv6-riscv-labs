@@ -70,10 +70,26 @@ usertrap(void)
   } else if(r_scause()==13 || r_scause() ==15){
     uint64 stval=r_stval();
     if(stval>= p->sz) {
-      p->killed=1;
-      exit(-1);
+      printf("starting loop for checking");
+      for(int i = 0; i < MAX_MMR; i++){ 
+	     printf("inside loop");
+       if(p->mmr[i].valid && stval >= p->mmr[i].addr && stval < p->mmr[i].addr + p->mmr[i].length){
+	      printf("starting valid_permission");
+	int valid_permission = 0;
+      if(r_scause()==13 && (p->mmr[i].prot & PTE_R)){
+	printf("validation");
+	valid_permission = 1;}
+      else if(r_scause() == 15 && (p->mmr[i].prot & PTE_W)){
+	     printf("validation");
+	     valid_permission = 1;}
+	if(!valid_permission){
+          p->killed = 1;
+          exit(-1);
+       }
+      }
+     }
     }
-    char *mem =kalloc();
+    char *mem = kalloc();
     if(mem==0){
       p->killed=1;
       exit(-1);

@@ -139,10 +139,8 @@ mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa, int perm)
 {
   uint64 a, last;
   pte_t *pte;
-
-  if(size == 0)
+  if(size==0)
     panic("mappages: size");
-  
   a = PGROUNDDOWN(va);
   last = PGROUNDDOWN(va + size - 1);
   for(;;){
@@ -298,18 +296,18 @@ uvmfree(pagetable_t pagetable, uint64 sz)
 // returns 0 on success, -1 on failure.
 // frees any allocated pages on failure.
 int
-uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
+uvmcopy(pagetable_t old, pagetable_t new, uint64 start, uint64 end)
 {
   pte_t *pte;
   uint64 pa, i;
   uint flags;
   char *mem;
 
-  for(i = 0; i < sz; i += PGSIZE){
+  for(i = start; i < end; i += PGSIZE){
     if((pte = walk(old, i, 0)) == 0)
       panic("uvmcopy: pte should exist");
     if((*pte & PTE_V) == 0)
-      continue;
+      panic("uvmcopy: page not present");
     pa = PTE2PA(*pte);
     flags = PTE_FLAGS(*pte);
     if((mem = kalloc()) == 0)
@@ -326,7 +324,30 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
   uvmunmap(new, 0, i / PGSIZE, 1);
   return -1;
 }
-
+int
+uvmcopyshared(pagetable_t old, pagetable_t new, uint64 start, uint64 end)
+{
+  pte_t *pte;
+  uint64 pa, i;
+  uint flags;
+ 
+  for(i = start; i < end; i += PGSIZE){
+    if((pte = walk(old, i, 0)) == 0)
+      panic("uvmcopy: pte should exist");
+    if((*pte & PTE_V) == 0)
+      panic("uvmcopy: page not present");
+    pa = PTE2PA(*pte);
+    flags = PTE_FLAGS(*pte);
+    if(mappages(new, i, PGSIZE, (uint64)pa, flags) != 0){
+      goto err;
+    }
+  }
+  return 0;
+ 
+err:
+  uvmunmap(new, 0, i / PGSIZE, 1);
+  return -1;
+}
 // mark a PTE invalid for user access.
 // used by exec for the user stack guard page.
 void
@@ -431,4 +452,42 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
   } else {
     return -1;
   }
+}
+[12:27 PM] Reyes, Franz A
+// Allocate page table pages for PTEs if needed but leave valid bits unchanged
+
+int
+
+mapvpages(pagetable_t pagetable, uint64 va, uint64 size)
+
+{
+
+  uint64 a, last;
+
+  pte_t *pte;
+
+  a = PGROUNDDOWN(va);
+
+  last = PGROUNDDOWN(va + size -1 );
+
+  for(;;){
+
+    if((pte = walk(pagetable, a , 1))==0)
+
+       return -1;
+
+    if(*pte & PTE_V)
+
+       panic("mappages: remap");
+
+    if(a == last)
+
+       break;
+
+    a += PGSIZE;
+
+  }
+
+  return 0;
+
 }
