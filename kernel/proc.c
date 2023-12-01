@@ -11,7 +11,7 @@ struct cpu cpus[NCPU];
 struct proc proc[NPROC];
 struct proc *initproc;
 
-struct mmr_list mmr_list[NPORC*MAX_MMR];
+struct mmr_list mmr_list[NPROC*MAX_MMR];
 struct spinlock listid_lock;
 uint64 cur_max;
 
@@ -310,7 +310,7 @@ fork(void)
   }
 
   // Copy user memory from parent to child.
-  if(uvmcopy(p->pagetable, np->pagetable, p->sz) < 0){
+  if(uvmcopy(p->pagetable, np->pagetable,0, p->sz) < 0){
     freeproc(np);
     release(&np->lock);
     return -1;

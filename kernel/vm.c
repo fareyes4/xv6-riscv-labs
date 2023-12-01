@@ -453,7 +453,6 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
     return -1;
   }
 }
-[12:27 PM] Reyes, Franz A
 // Allocate page table pages for PTEs if needed but leave valid bits unchanged
 
 int

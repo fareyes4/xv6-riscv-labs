@@ -84,11 +84,11 @@ struct trapframe {
 struct mmr_list { 
   struct spinlock lock;
   int valid;
-}
+};
  
 // struct for node in list of processes that share a mapped memory region
 struct mmr_node {
- int      listid;                        // index into mmr_list array with per-list locks
+ int listid;                        // index into mmr_list array with per-list locks
  struct proc *proc;              // this process so it can be found easily
  struct mmr_node *next;  // next process in family
  struct mmr_node *prev;  // previous process in family
@@ -109,8 +109,6 @@ struct mmr {
 // Per-process state
 struct proc {
   struct spinlock lock;
-  struct mmr mmr[MAX_MMR];
-  uint64 cur_max;
 
   // p->lock must be held when using these:
   enum procstate state;        // Process state
