@@ -1,10 +1,11 @@
 #include "kernel/types.h"
 #include "user/user.h"
 #include "kernel/stat.h"
-
+#include <stddef.h>
+ 
 #define BSIZE 2048
 #define MAX 2048
-
+ 
 typedef struct {
     int buf[BSIZE];
     int nextin;
@@ -13,9 +14,9 @@ typedef struct {
     int num_consumed;
     int total;
 } buffer_t;
-
+ 
 buffer_t *buffer;
-
+ 
 void *producer()
 {
     while(1) {
@@ -27,7 +28,7 @@ void *producer()
 	buffer->nextin %= BSIZE;
     }
 }
-
+ 
 void *consumer()
 {
     while(1) {
@@ -39,7 +40,7 @@ void *consumer()
 	buffer->num_consumed++;
     }
 }
-
+ 
 int main(int argc, char *argv[])
 {
     buffer = (buffer_t *) mmap(NULL, sizeof(buffer_t),
