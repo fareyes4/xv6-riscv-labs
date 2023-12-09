@@ -137,7 +137,6 @@ UPROGS=\
 	$U/_ps\
 	$U/_pstree\
 	$U/_pstest\
-	$U/_uptime\
 	$U/_free\
 	$U/_memory-user\
 	$U/_private\
